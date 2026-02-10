@@ -1,8 +1,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { TrainingSession, Challenge, LabEntry } from "../types";
 
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+// Helper to safely get the AI client only when needed
+const getAiClient = () => {
+  // Use Vite's import.meta.env for environment variables
+  // @ts-ignore - Ignore type checking for import.meta.env in this context
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+  if (!apiKey) {
+      console.warn("VITE_GEMINI_API_KEY is not set. AI features will not work.");
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 const SYSTEM_INSTRUCTION = `You are a world-class Brazilian Jiu-Jitsu coach and analyst named "Coach G". 
 Your goal is to help students improve by analyzing their training logs, suggesting technical fixes, and providing strategic advice.
@@ -23,6 +31,7 @@ export const analyzeTrainingPatterns = async (sessions: TrainingSession[]): Prom
   ${sessionSummary}`;
 
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
@@ -43,6 +52,7 @@ export const getTechnicalAdvice = async (query: string, context?: string): Promi
     : query;
 
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: fullPrompt,
@@ -59,6 +69,7 @@ export const getTechnicalAdvice = async (query: string, context?: string): Promi
 
 export const suggestDrills = async (position: string): Promise<string[]> => {
     try {
+        const ai = getAiClient();
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
             contents: `Suggest 3 specific solo or partner drills to improve the '${position}' position in BJJ. Return JSON.`,
@@ -107,6 +118,7 @@ export const generateChallengeInsight = async (challenge: Challenge, entries: La
     `;
 
     try {
+        const ai = getAiClient();
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
             contents: prompt,
