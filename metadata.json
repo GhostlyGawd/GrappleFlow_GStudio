@@ -1,0 +1,5 @@
+{
+  "name": "GrappleFlow: BJJ Companion",
+  "description": "A smart training journal for Brazilian Jiu-Jitsu practitioners. Log sessions, track techniques, visualize progress, and get personalized coaching insights powered by Gemini AI.",
+  "requestFramePermissions": []
+}
